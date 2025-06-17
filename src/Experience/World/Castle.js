@@ -1,7 +1,7 @@
 import * as THREE from "three"
 import Experience from "../Experience.js"
 
-export default class Fox {
+export default class Castle {
   constructor() {
     this.experience = new Experience()
     this.scene = this.experience.scene
@@ -10,9 +10,9 @@ export default class Fox {
     this.debug = this.experience.debug
 
     // Debug
-    if (this.debug.active) {
-      this.debugFolder = this.debug.ui.addFolder("fox")
-    }
+    // if (this.debug.active) {
+    //   this.debugFolder = this.debug.ui.addFolder("castle")
+    // }
 
     // Resource
     this.resource = this.resources.items.foxModel
@@ -23,16 +23,6 @@ export default class Fox {
   }
 
   setModel() {
-    // this.model = this.resource.scene
-    // this.model.scale.set(0.02, 0.02, 0.02)
-    // this.scene.add(this.model)
-
-    // this.model.traverse((child) => {
-    //   if (child instanceof THREE.Mesh) {
-    //     child.castShadow = true
-    //   }
-    // })
-
     this.castleModel = this.castle.scene
     this.castleModel.scale.set(0.08, 0.08, 0.08)
     this.scene.add(this.castleModel)

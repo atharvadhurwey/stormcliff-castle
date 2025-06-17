@@ -1,4 +1,4 @@
-# Template for threejs
+# Threejs Castle
 
 ## Links
 - [Live](https://castle-story.vercel.app/)

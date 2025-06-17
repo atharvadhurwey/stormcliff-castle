@@ -1,5 +1,6 @@
 import * as THREE from "three"
 import Experience from "../Experience.js"
+import { createCloudMateiral } from "../Materials/cloudMaterial.js"
 
 export default class Environment {
   constructor() {
@@ -7,6 +8,7 @@ export default class Environment {
     this.scene = this.experience.scene
     this.resources = this.experience.resources
     this.debug = this.experience.debug
+    this.camera = this.experience.camera.instance
 
     // Debug
     if (this.debug.active) {
@@ -18,33 +20,53 @@ export default class Environment {
     this.setEnvironmentMap()
     // this.setAmbientLight()
     this.setFog()
+
+    this.setDarkClouds()
   }
 
   setSunLight() {
     this.sunLight = new THREE.DirectionalLight("#acacc1", 2)
     this.sunLight.castShadow = true
-    this.sunLight.shadow.camera.far = 100
+    this.sunLight.shadow.camera.far = 10
     this.sunLight.shadow.mapSize.set(2048, 2048)
     this.sunLight.shadow.normalBias = 0.04
-    this.sunLight.position.set(3.5, 2, -1.25)
     this.scene.add(this.sunLight)
 
     this.helper = new THREE.DirectionalLightHelper(this.sunLight, 5)
     this.scene.add(this.helper)
 
+    // Default spherical coordinates
+    this.sunConfig = {
+      radius: 10,
+      theta: Math.PI / 4, // around Y (horizontal)
+      phi: Math.PI / 3, // from top (vertical)
+    }
+
+    const updateSunPosition = () => {
+      const { radius, theta, phi } = this.sunConfig
+      const x = radius * Math.sin(phi) * Math.cos(theta)
+      const y = radius * Math.cos(phi)
+      const z = radius * Math.sin(phi) * Math.sin(theta)
+      this.sunLight.position.set(x, y, z)
+      this.helper.update()
+    }
+
+    updateSunPosition()
+
     // Debug
     if (this.debug.active) {
-      this.debugFolder.add(this.sunLight, "intensity").name("sunLightIntensity").min(0).max(10).step(0.001)
-
-      this.debugFolder.add(this.sunLight.position, "x").name("sunLightX").min(-50).max(50).step(0.001)
-
-      this.debugFolder.add(this.sunLight.position, "y").name("sunLightY").min(-50).max(50).step(0.001)
-
-      this.debugFolder.add(this.sunLight.position, "z").name("sunLightZ").min(-50).max(50).step(0.001)
-
-      this.debugFolder.add(this.sunLight.rotation, "x").name("sunLightRotationX").min(-Math.PI).max(Math.PI).step(0.001)
-      this.debugFolder.add(this.sunLight.rotation, "y").name("sunLightRotationY").min(-Math.PI).max(Math.PI).step(0.001)
-      this.debugFolder.add(this.sunLight.rotation, "z").name("sunLightRotationZ").min(-Math.PI).max(Math.PI).step(0.001)
+      this.sunDebugFolder = this.debugFolder.addFolder("sun")
+      this.sunDebugFolder.add(this.sunLight, "intensity").name("sunLightIntensity").min(0).max(10).step(0.001)
+      this.sunDebugFolder.addColor(this.sunLight, "color").name("sunLightColor")
+      // this.sunDebugFolder.add(this.sunConfig, "radius").min(0).max(50).step(0.1).onChange(updateSunPosition)
+      this.sunDebugFolder
+        .add(this.sunConfig, "theta")
+        .name("theta (π rad)")
+        .min(0)
+        .max(Math.PI * 2)
+        .step(0.01)
+        .onChange(updateSunPosition)
+      this.sunDebugFolder.add(this.sunConfig, "phi").name("phi (π rad)").min(0).max(Math.PI).step(0.01).onChange(updateSunPosition)
     }
   }
 
@@ -102,12 +124,64 @@ export default class Environment {
   }
 
   setFog() {
-    this.scene.fog = new THREE.FogExp2("#acacc1", 0.01)
+    this.scene.fog = new THREE.FogExp2("#87889c", 0.01)
 
     // Debug
     if (this.debug.active) {
       this.debugFolder.addColor(this.scene.fog, "color").name("fogColor")
       this.debugFolder.add(this.scene.fog, "density").name("fogDensity").min(0).max(0.1).step(0.001)
+    }
+  }
+
+  setDarkClouds() {
+    const darkCloudsProps = {
+      threshold: 0.2,
+      opacity: 0.1,
+      range: 0.08,
+      steps: 9,
+      position: new THREE.Vector3(0, 50, 0),
+      color: "#87889c",
+      scale: new THREE.Vector3(500, 100, 500),
+      depthTest: true,
+    }
+
+    const cloudGeometry = new THREE.SphereGeometry(1, 1, 1)
+    const cloudMaterial = createCloudMateiral({
+      threshold: darkCloudsProps.threshold,
+      opacity: darkCloudsProps.opacity,
+      range: darkCloudsProps.range,
+      steps: darkCloudsProps.steps,
+      color: darkCloudsProps.color,
+    })
+
+    this.cloudsMesh = new THREE.Mesh(cloudGeometry, cloudMaterial)
+
+    this.cloudsMesh.position.copy(darkCloudsProps.position)
+    this.cloudsMesh.scale.copy(darkCloudsProps.scale)
+
+    this.scene.add(this.cloudsMesh)
+
+    // Debug
+    if (this.debug.active) {
+      this.cloudDebugFolder = this.debugFolder.addFolder("clouds")
+      this.cloudDebugFolder.add(this.cloudsMesh.material.uniforms.threshold, "value").name("cloudsMeshThreshold").min(0).max(1).step(0.001)
+      this.cloudDebugFolder.add(this.cloudsMesh.material.uniforms.opacity, "value").name("cloudsMeshOpacity").min(0).max(1).step(0.001)
+      this.cloudDebugFolder.add(this.cloudsMesh.material.uniforms.range, "value").name("cloudsMeshRange").min(0).max(0.2).step(0.001)
+      this.cloudDebugFolder.add(this.cloudsMesh.material.uniforms.steps, "value").name("cloudsMeshSteps").min(1).max(128).step(1)
+
+      this.cloudDebugFolder.add(this.cloudsMesh.position, "y").name("cloudsMeshY").min(-100).max(100).step(1)
+      this.cloudDebugFolder.add(this.cloudsMesh.scale, "x").name("cloudsMeshScaleX").min(0).max(500).step(1)
+      this.cloudDebugFolder.add(this.cloudsMesh.scale, "y").name("cloudsMeshScaleY").min(0).max(500).step(1)
+      this.cloudDebugFolder.add(this.cloudsMesh.scale, "z").name("cloudsMeshScaleZ").min(0).max(500).step(1)
+    }
+  }
+
+  update() {
+    if (this.cloudsMesh) {
+      this.cloudsMesh.material.uniforms.cameraPos.value.copy(this.camera.position)
+      this.cloudsMesh.rotation.y = -performance.now() / 7500
+
+      this.cloudsMesh.material.uniforms.frame.value++
     }
   }
 }
