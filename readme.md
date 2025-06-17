@@ -1,8 +1,8 @@
 # Template for threejs
 
 ## Links
-- [Live](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
-- [Github](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+- [Live](https://castle-story.vercel.app/)
+- [Github](https://github.com/atharvadhurwey/castle-story/)
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
