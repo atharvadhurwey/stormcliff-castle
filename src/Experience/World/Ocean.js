@@ -1,7 +1,7 @@
 import * as THREE from "three"
 import Experience from "../Experience.js"
-import vertexShader from "../../Shaders/ocean/vertex.glsl"
-import fragmentShader from "../../Shaders/ocean/fragment.glsl"
+import vertexShader from "../../shaders/ocean/vertex.glsl"
+import fragmentShader from "../../shaders/ocean/fragment.glsl"
 
 export default class Ocean {
   constructor(options) {
