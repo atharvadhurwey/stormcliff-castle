@@ -24,7 +24,7 @@ export default class Castle {
 
   setModel() {
     this.castleModel = this.castle.scene
-    this.castleModel.scale.set(0.08, 0.08, 0.08)
+    this.castleModel.scale.set(0.01, 0.01, 0.01)
     this.scene.add(this.castleModel)
 
     this.castleModel.traverse((child) => {

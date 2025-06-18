@@ -13,6 +13,7 @@ export default class Environment {
     // Debug
     if (this.debug.active) {
       this.debugFolder = this.debug.ui.addFolder("environment")
+      this.debugFolder.close()
     }
 
     this.setSunLight()
@@ -32,8 +33,10 @@ export default class Environment {
     this.sunLight.shadow.normalBias = 0.04
     this.scene.add(this.sunLight)
 
-    this.helper = new THREE.DirectionalLightHelper(this.sunLight, 5)
-    this.scene.add(this.helper)
+    if (this.debug.active) {
+      this.helper = new THREE.DirectionalLightHelper(this.sunLight, 5)
+      this.scene.add(this.helper)
+    }
 
     // Default spherical coordinates
     this.sunConfig = {
@@ -48,7 +51,10 @@ export default class Environment {
       const y = radius * Math.cos(phi)
       const z = radius * Math.sin(phi) * Math.sin(theta)
       this.sunLight.position.set(x, y, z)
-      this.helper.update()
+
+      if (this.debug.active) {
+        this.helper.update()
+      }
     }
 
     updateSunPosition()
@@ -89,7 +95,7 @@ export default class Environment {
 
   setEnvironmentMap() {
     this.environmentMap = {}
-    this.environmentMap.intensity = 1
+    this.environmentMap.intensity = 0.4
     this.environmentMap.texture = this.resources.items.environmentMapTexture
     this.environmentMap.texture.colorSpace = THREE.SRGBColorSpace
 
