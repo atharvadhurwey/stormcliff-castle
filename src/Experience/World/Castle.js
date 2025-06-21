@@ -8,6 +8,7 @@ export default class Castle {
     this.resources = this.experience.resources
     this.time = this.experience.time
     this.debug = this.experience.debug
+    this.raycaster = this.experience.raycaster
 
     // Debug
     // if (this.debug.active) {
@@ -24,10 +25,20 @@ export default class Castle {
 
   setModel() {
     this.castleModel = this.castle.scene
-    this.castleModel.scale.set(0.01, 0.01, 0.01)
     this.scene.add(this.castleModel)
 
+    this.TreePosition = null
+
     this.castleModel.traverse((child) => {
+      if (child.name.includes("_raycast") && !child.name.includes("_raycast_")) {
+        this.raycaster.registerObjectForRaycast(child)
+      }
+
+      // Special case to Burn the tree later
+      if (child.name.includes("Tree_raycast") && !child.name.includes("Tree_raycast_")) {
+        this.TreePosition = child.position.clone()
+      }
+
       if (child instanceof THREE.Mesh) {
         child.castShadow = true
         child.receiveShadow = true

@@ -35,7 +35,7 @@ export default class Renderer {
     this.instance.setClearColor(debugObject.clearColor)
     this.instance.setSize(this.sizes.width, this.sizes.height)
     this.instance.setPixelRatio(this.sizes.pixelRatio)
-    // this.instance.outputEncoding = THREE.sRGBEncoding
+    this.instance.outputColorSpace = THREE.SRGBColorSpace
 
     // Debug
     if (this.experience.debug.active) {

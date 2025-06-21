@@ -26,11 +26,20 @@ export default class Environment {
   }
 
   setSunLight() {
-    this.sunLight = new THREE.DirectionalLight("#acacc1", 2)
+    this.sunLightObject = {
+      intensity: 2,
+      color: "#acacc1",
+      far: 10,
+      normalBias: 0.04,
+      radius: 1,
+    }
+
+    this.sunLight = new THREE.DirectionalLight(this.sunLightObject.color, this.sunLightObject.intensity)
     this.sunLight.castShadow = true
-    this.sunLight.shadow.camera.far = 10
+    this.sunLight.shadow.camera.far = this.sunLightObject.far
     this.sunLight.shadow.mapSize.set(2048, 2048)
-    this.sunLight.shadow.normalBias = 0.04
+    this.sunLight.shadow.normalBias = this.sunLightObject.normalBias
+    this.sunLight.shadow.radius = this.sunLightObject.radius
     this.scene.add(this.sunLight)
 
     if (this.debug.active) {
@@ -73,6 +82,16 @@ export default class Environment {
         .step(0.01)
         .onChange(updateSunPosition)
       this.sunDebugFolder.add(this.sunConfig, "phi").name("phi (π rad)").min(0).max(Math.PI).step(0.01).onChange(updateSunPosition)
+      this.sunDebugFolder
+        .add(this.sunLightObject, "normalBias")
+        .min(0)
+        .max(0.1)
+        .onChange(() => (this.sunLight.shadow.normalBias = this.sunLightObject.normalBias))
+      this.sunDebugFolder
+        .add(this.sunLightObject, "radius")
+        .min(0)
+        .max(5)
+        .onChange(() => (this.sunLight.shadow.radius = this.sunLightObject.radius))
     }
   }
 

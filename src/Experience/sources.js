@@ -22,6 +22,11 @@ export default [
     path: "textures/dirt/normal.jpg",
   },
   {
+    name: "fireTexture",
+    type: "texture",
+    path: "textures/fire/fire.png",
+  },
+  {
     name: "foxModel",
     type: "gltfModel",
     path: "models/Fox/glTF/Fox.gltf",

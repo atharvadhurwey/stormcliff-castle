@@ -59,8 +59,8 @@ export default class Ocean {
         uColorMultiplier: { value: 5 },
         uColorOpacity: { value: 0.95 },
 
-        uLightIntensity: { value: 2.8 },
-        uLightPosition: { value: new THREE.Vector3(0, 0.25, 0) }, // Adjust as needed
+        uLightIntensity: { value: 10 },
+        uLightPosition: { value: new THREE.Vector3(0, 0.6, 0) }, // Adjust as needed
         uLightSpecularPower: { value: 30.0 }, // Adjust specular power
         uLightDecay: { value: 0.95 }, // Adjust decay factor
       },
@@ -92,10 +92,10 @@ export default class Ocean {
       this.debugFolder.add(this.material.uniforms.uColorOffset, "value").min(0).max(1).step(0.001).name("uColorOffset").name("Color Offset")
       this.debugFolder.add(this.material.uniforms.uColorMultiplier, "value").min(0).max(10).step(0.001).name("uColorMultiplier").name("Color Multiplier")
 
-      this.debugFolder.add(this.material.uniforms.uLightIntensity, "value").min(0).max(10).step(0.001).name("uLightIntensity").name("Light Intensity")
-      this.debugFolder.add(this.material.uniforms.uLightPosition.value, "x").min(-50).max(50).step(0.001).name("uLightPositionX").name("Light Position X")
-      this.debugFolder.add(this.material.uniforms.uLightPosition.value, "y").min(-50).max(50).step(0.001).name("uLightPositionY").name("Light Position Y")
-      this.debugFolder.add(this.material.uniforms.uLightPosition.value, "z").min(-50).max(50).step(0.001).name("uLightPositionZ").name("Light Position Z")
+      this.debugFolder.add(this.material.uniforms.uLightIntensity, "value").min(0).max(20).step(0.001).name("uLightIntensity").name("Light Intensity")
+      this.debugFolder.add(this.material.uniforms.uLightPosition.value, "x").min(-2).max(2).step(0.001).name("uLightPositionX").name("Light Position X")
+      this.debugFolder.add(this.material.uniforms.uLightPosition.value, "y").min(-2).max(2).step(0.001).name("uLightPositionY").name("Light Position Y")
+      this.debugFolder.add(this.material.uniforms.uLightPosition.value, "z").min(-2).max(2).step(0.001).name("uLightPositionZ").name("Light Position Z")
       this.debugFolder.add(this.material.uniforms.uLightSpecularPower, "value").min(1).max(20).step(1).name("uLightSpecularPower").name("Light Specular Power")
       this.debugFolder.add(this.material.uniforms.uLightDecay, "value").min(0).max(10).step(0.01).name("uLightDecay").name("Light Decay")
     }

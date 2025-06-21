@@ -3,6 +3,7 @@ import Environment from "./Environment.js"
 import Floor from "./Floor.js"
 import Castle from "./Castle.js"
 import Ocean from "./Ocean.js"
+import Lightning from "./Lightning.js"
 
 export default class World {
   constructor() {
@@ -17,6 +18,7 @@ export default class World {
       this.castle = new Castle()
       this.environment = new Environment()
       this.ocean = new Ocean({ resolution: 512, environmentMap: this.environment.environmentMap })
+      this.lightning = new Lightning()
     })
   }
 
@@ -24,5 +26,6 @@ export default class World {
     if (this.castle) this.castle.update()
     if (this.environment) this.environment.update()
     if (this.ocean) this.ocean.update()
+    if (this.lightning) this.lightning.update()
   }
 }
