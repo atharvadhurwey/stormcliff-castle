@@ -28,6 +28,7 @@ export default class Castle {
     this.scene.add(this.castleModel)
 
     this.TreePosition = null
+    this.Tree = null
 
     this.castleModel.traverse((child) => {
       if (child.name.includes("_raycast") && !child.name.includes("_raycast_")) {
@@ -36,6 +37,7 @@ export default class Castle {
 
       // Special case to Burn the tree later
       if (child.name.includes("Tree_raycast") && !child.name.includes("Tree_raycast_")) {
+        this.Tree = child
         this.TreePosition = child.position.clone()
       }
 

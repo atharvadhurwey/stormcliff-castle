@@ -2,6 +2,8 @@ import * as THREE from "three"
 import Experience from "../Experience.js"
 import { EffectComposer, LightningStrike, OutlinePass, RenderPass } from "three-stdlib"
 import ParticleSystem from "../Utils/ParticleSystem.js"
+import { createDissolveMaterial } from "../Utils/DissolveMaterial.js"
+import { easing } from "maath"
 
 export default class Lightning {
   constructor() {
@@ -19,9 +21,14 @@ export default class Lightning {
     }
 
     // Tree properties
+    this.Tree = null
     this.TreePosition = null
     this.isTreeBurned = false
+    this.isBurning = false // Flag to track if the tree is burning
+    this.isTreeDissolving = false // Flag to track if the tree is dissolved
+    this.burningDuration = 10000 // Duration for the fire effect in milliseconds
     if (this.experience.world.castle && this.experience.world.castle.TreePosition) {
+      this.Tree = this.experience.world.castle.Tree
       this.TreePosition = this.experience.world.castle.TreePosition.clone()
     }
 
@@ -43,13 +50,18 @@ export default class Lightning {
     }, 100) // Slight delay to let resources settle
 
     // this.burnTree()
+    this.dissolveTree()
+  }
+
+  dissolveTree() {
+    const baseMaterial = new THREE.MeshStandardMaterial({ color: this.Tree.children[0].material.color })
+    this.dissolveMaterial = new createDissolveMaterial({ baseMaterial: baseMaterial })
+    this.Tree.children[0].material = this.dissolveMaterial.material // Replace the tree's material with the dissolve material
   }
 
   burnTree() {
     if (this.isTreeBurned) return // Prevent multiple burns
     this.isTreeBurned = true // Flag to prevent multiple burns
-
-    const burningDuration = 10000 // Duration for the fire effect in milliseconds
 
     this.fireParticles = new ParticleSystem({
       parent: this.scene,
@@ -58,6 +70,7 @@ export default class Lightning {
     })
 
     this.isBurning = true
+    this.isTreeDissolving = true // Start dissolving the tree
 
     this.fireLightDecaySpeed = 0.00001 // Speed at which the light decays
     this.isFireLightDecaying = false
@@ -76,7 +89,8 @@ export default class Lightning {
     this.burnTimeout = setTimeout(() => {
       this.fireParticles._emit = false
       this.isFireLightDecaying = true
-    }, burningDuration)
+      this.experience.raycaster.objects = this.experience.raycaster.objects.filter((obj) => obj !== this.Tree) // Remove the tree from raycastable objects
+    }, this.burningDuration)
   }
 
   castLightningStrike(endPosition) {
@@ -264,6 +278,7 @@ export default class Lightning {
 
   update() {
     const t = this.experience.time.elapsed * 0.0005
+    const delta = this.experience.time.delta
 
     this.renderer.autoClear = false
     this.renderer.clear()
@@ -288,6 +303,13 @@ export default class Lightning {
           this.fireLight.intensity = 0 // Ensure it doesn't go below 0
           this.isFireLightDecaying = false // Stop decaying once it reaches 0
         }
+      }
+    }
+
+    if (this.dissolveMaterial && (this.isBurning || this.isTreeDissolving)) {
+      easing.damp(this.dissolveMaterial.uniforms.uProgress, "value", 0, this.burningDuration * 0.7, delta) // Smoothly transition the dissolve effect
+      if (this.dissolveMaterial.uniforms.uProgress.value <= 0 && this.isTreeDissolving) {
+        this.isTreeDissolving = false // Mark the tree as burned
       }
     }
 
