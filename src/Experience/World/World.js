@@ -14,7 +14,7 @@ export default class World {
     // Wait for resources
     this.resources.on("ready", () => {
       // Setup
-      this.floor = new Floor()
+      // this.floor = new Floor()
       this.castle = new Castle()
       this.environment = new Environment()
       this.ocean = new Ocean({ resolution: 512, environmentMap: this.environment.environmentMap })

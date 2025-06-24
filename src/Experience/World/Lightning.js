@@ -32,12 +32,26 @@ export default class Lightning {
       this.TreePosition = this.experience.world.castle.TreePosition.clone()
     }
 
+    // Bridge properties
+    this.Bridge = null
+    this.BridgePosition = null
+    if (this.experience.world.castle && this.experience.world.castle.BridgePosition) {
+      this.Bridge = this.experience.world.castle.Bridge
+      this.BridgePosition = this.experience.world.castle.BridgePosition.clone()
+    }
+
     this.defaultOceanLightIntensity = null
     if (this.experience.world.ocean && this.experience.world.ocean.material) {
       this.defaultOceanLightIntensity = this.experience.world.ocean.material.uniforms.uLightIntensity.value
     }
 
+    this.randomLightningStrikes = []
+    this.maxRandomStrikes = 10
+
     this.createLightning()
+    this.createBurnEffect()
+    // this.burnTree()
+    this.dissolveTree()
 
     setTimeout(() => {
       // Pre-warm lightning rendering
@@ -47,10 +61,62 @@ export default class Lightning {
       this.composer.render()
       this.lightningStrikeMesh.visible = false
       this.light.visible = false
-    }, 100) // Slight delay to let resources settle
+      console.log("Lightning pre-warmed and ready for action.")
+    }, 1000) // Slight delay to let resources settle
 
-    // this.burnTree()
-    this.dissolveTree()
+    this.randomLightningInterval = 3000 // 3 seconds
+    this.randomLightningRadius = 100 // radius around the camera/player
+    this.randomLightningEnabled = true
+    this.randomLightningCount = 6
+    this.randomLightningDelayMax = 3000
+
+    this.startRandomLightning()
+  }
+
+  // startRandomLightning() {
+  //   setInterval(() => {
+  //     if (!this.randomLightningEnabled) return
+
+  //     const lightningCount = this.randomLightningCount
+
+  //     for (let i = 0; i < lightningCount; i++) {
+  //       const angle = Math.random() * Math.PI * 2
+  //       const radius = this.randomLightningRadius * Math.sqrt(Math.random())
+  //       const x = Math.cos(angle) * radius
+  //       const z = Math.sin(angle) * radius
+
+  //       const center = this.camera.position.clone()
+  //       const startPosition = new THREE.Vector3(center.x + x, 50, center.z + z)
+  //       const endPosition = new THREE.Vector3(center.x + x, 0, center.z + z)
+
+  //       this.castRandomLightningStrike(startPosition, endPosition)
+  //     }
+  //   }, this.randomLightningInterval)
+  // }
+
+  startRandomLightning() {
+    setInterval(() => {
+      if (!this.randomLightningEnabled) return
+
+      const lightningCount = this.randomLightningCount
+
+      for (let i = 0; i < lightningCount; i++) {
+        const delay = Math.random() * this.randomLightningDelayMax
+
+        setTimeout(() => {
+          const angle = Math.random() * Math.PI * 2
+          const radius = this.randomLightningRadius * Math.sqrt(Math.random())
+          const x = Math.cos(angle) * radius
+          const z = Math.sin(angle) * radius
+
+          const center = this.camera.position.clone()
+          const startPosition = new THREE.Vector3(center.x + x, 50, center.z + z)
+          const endPosition = new THREE.Vector3(center.x + x, 0, center.z + z)
+
+          this.castRandomLightningStrike(startPosition, endPosition)
+        }, delay)
+      }
+    }, this.randomLightningInterval)
   }
 
   dissolveTree() {
@@ -59,38 +125,88 @@ export default class Lightning {
     this.Tree.children[0].material = this.dissolveMaterial.material // Replace the tree's material with the dissolve material
   }
 
-  burnTree() {
-    if (this.isTreeBurned) return // Prevent multiple burns
-    this.isTreeBurned = true // Flag to prevent multiple burns
-
+  createBurnEffect() {
     this.fireParticles = new ParticleSystem({
       parent: this.scene,
       camera: this.camera,
       position: this.TreePosition,
     })
 
-    this.isBurning = true
-    this.isTreeDissolving = true // Start dissolving the tree
-
     this.fireLightDecaySpeed = 0.00001 // Speed at which the light decays
-    this.isFireLightDecaying = false
 
     this.fireLight = new THREE.PointLight(0xffa500, 0.01)
     this.fireLight.position.copy(this.TreePosition).add(new THREE.Vector3(0, 0.03, 0)) // Position the light slightly above the tree
-
     // this.fireLight.castShadow = true
+    this.fireLight.visible = false // Start with the light invisible
     this.scene.add(this.fireLight)
 
     if (this.debug.active) {
       this.fireLightHelper = new THREE.PointLightHelper(this.fireLight, 0.05)
       this.scene.add(this.fireLightHelper)
     }
+  }
+
+  burnTree() {
+    if (this.isTreeBurned) return // Prevent multiple burns
+    this.isTreeBurned = true // Flag to prevent multiple burns
+
+    this.isBurning = true
+    this.isTreeDissolving = true // Start dissolving the tree
+
+    this.fireLight.visible = true // Make the fire light visible
+
+    this.isFireLightDecaying = false
 
     this.burnTimeout = setTimeout(() => {
       this.fireParticles._emit = false
       this.isFireLightDecaying = true
       this.experience.raycaster.objects = this.experience.raycaster.objects.filter((obj) => obj !== this.Tree) // Remove the tree from raycastable objects
     }, this.burningDuration)
+  }
+
+  collapseBridge() {
+    this.experience.world.castle.Bridge.visible = false // Hide the bridge
+    this.experience.world.castle.BridgeBrick.visible = false // Hide the bridge bricks
+
+    this.experience.world.castle.setAnimation()
+  }
+
+  // castRandomLightningStrike(startPosition, endPosition) {
+  //   const timeLimit = 1000
+
+  //   this.randomLightningStrike.rayParameters.sourceOffset.copy(startPosition)
+  //   this.randomLightningStrike.rayParameters.destOffset.copy(endPosition)
+
+  //   this.randomLightningStrikeMesh.visible = true // Show the mesh when casting lightning
+
+  //   if (this.randomHideTimeout) clearTimeout(this.randomHideTimeout) // Clear any existing timeout
+
+  //   // Hide lightning after 1 second
+  //   this.randomHideTimeout = setTimeout(() => {
+  //     this.randomLightningStrikeMesh.visible = false
+  //   }, timeLimit)
+  // }
+  castRandomLightningStrike(startPosition, endPosition) {
+    const timeLimit = 1000
+
+    // Find an inactive strike
+    const available = this.randomLightningStrikes.find((s) => !s.active)
+    if (!available) return // All busy
+
+    const { strike, mesh } = available
+
+    strike.rayParameters.sourceOffset.copy(startPosition)
+    strike.rayParameters.destOffset.copy(endPosition)
+
+    mesh.visible = true
+    available.active = true
+
+    // Auto-hide and mark as inactive
+    if (available.hideTimeout) clearTimeout(available.hideTimeout)
+    available.hideTimeout = setTimeout(() => {
+      mesh.visible = false
+      available.active = false
+    }, timeLimit)
   }
 
   castLightningStrike(endPosition) {
@@ -100,6 +216,11 @@ export default class Lightning {
     // Special case for burning the tree
     if (endPosition.x == this.TreePosition.x && endPosition.y == this.TreePosition.y && endPosition.z == this.TreePosition.z) {
       this.burnTree()
+    }
+
+    // Special case for destroying the bridge
+    if (endPosition.x == this.BridgePosition.x && endPosition.y == this.BridgePosition.y && endPosition.z == this.BridgePosition.z) {
+      this.collapseBridge()
     }
 
     const timeLimit = 500 // 1 second cooldown
@@ -154,6 +275,7 @@ export default class Lightning {
       extraHeight: 0.2,
       intensity: 0.5, // Default intensity
     }
+
     this.light = new THREE.PointLight(0x00ffff)
     this.light.extraHeight = this.lightObject.extraHeight
     this.light.castShadow = true
@@ -228,6 +350,51 @@ export default class Lightning {
 
     this.scene.add(this.lightningStrikeMesh)
 
+    for (let i = 0; i < this.maxRandomStrikes; i++) {
+      // Create random lightning strikes
+      const randomRayParams = {
+        sourceOffset: new THREE.Vector3(),
+        destOffset: new THREE.Vector3(),
+        radius0: 0.3,
+        radius1: 0.1,
+        minRadius: 2,
+        maxIterations: 7,
+        isEternal: true,
+
+        timeScale: 0.2,
+
+        propagationTimeFactor: 0.05,
+        vanishingTimeFactor: 0.95,
+        subrayPeriod: 2.5,
+        subrayDutyCycle: 0.3,
+        maxSubrayRecursion: 3,
+        ramification: 7,
+        recursionProbability: 0.6,
+
+        roughness: 0.85,
+        straightness: 0.68,
+      }
+
+      const strike = new LightningStrike(randomRayParams)
+      const mesh = new THREE.Mesh(strike, new THREE.MeshBasicMaterial({ color: this.lightningObject.lightningColor }))
+      mesh.visible = false
+
+      this.scene.add(mesh)
+
+      this.randomLightningStrikes.push({
+        strike,
+        mesh,
+        active: false,
+        hideTimeout: null,
+      })
+    }
+
+    // this.randomLightningStrike = new LightningStrike(randomRayParams)
+    // this.randomLightningStrikeMesh = new THREE.Mesh(this.randomLightningStrike, new THREE.MeshBasicMaterial({ color: this.lightningObject.lightningColor }))
+    // this.randomLightningStrikeMesh.visible = false // Hide the mesh by default
+    // // outlineMeshArray.push(this.randomLightningStrikeMesh)
+    // this.scene.add(this.randomLightningStrikeMesh)
+
     if (this.debug.active) {
       this.strikeDebugFolder = this.debugFolder.addFolder("Lightning Strike")
       this.strikeDebugFolder.add(this.lightningStrike.rayParameters, "radius0").min(0).max(0.5).step(0.001).name("Radius 0")
@@ -254,6 +421,7 @@ export default class Lightning {
       edgeThickness: 1,
       visibleEdgeColor: new THREE.Color(0x00aaff),
     }
+
     this.outlinePass = this.createOutline(
       this.composer,
       outlineMeshArray,
@@ -292,8 +460,17 @@ export default class Lightning {
       } // Update ocean light intensity
     }
 
+    // if (this.randomLightningStrike && this.randomLightningStrikeMesh.visible) {
+    //   this.randomLightningStrike.update(t)
+    // }
+    this.randomLightningStrikes.forEach(({ strike, mesh }) => {
+      if (mesh.visible) {
+        strike.update(t)
+      }
+    })
+
     if (this.isBurning) {
-      this.fireParticles.Step(0.016)
+      this.fireParticles.Step(delta * 0.003) // Update fire particles
       if (!this.fireParticles._emit && this.fireParticles._particles.length === 0) {
         this.isBurning = false // Stop burning if no particles left
       }

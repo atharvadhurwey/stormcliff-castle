@@ -19,6 +19,7 @@ export default class Ocean {
 
     this.options = options
     this.createOcean()
+    this.createFakeOceanFloor()
   }
 
   createOcean() {
@@ -99,6 +100,21 @@ export default class Ocean {
       this.debugFolder.add(this.material.uniforms.uLightSpecularPower, "value").min(1).max(20).step(1).name("uLightSpecularPower").name("Light Specular Power")
       this.debugFolder.add(this.material.uniforms.uLightDecay, "value").min(0).max(10).step(0.01).name("uLightDecay").name("Light Decay")
     }
+  }
+
+  createFakeOceanFloor() {
+    const floorGeometry = new THREE.CircleGeometry(8, 64) // Create a circle geometry for the ocean floor
+    const floorMaterial = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.5,
+    })
+    floorGeometry.deleteAttribute("normal") // Remove normals for better performance
+    floorGeometry.deleteAttribute("uv2") // Remove secondary UVs for better performance
+    const fakeOceanFloor = new THREE.Mesh(floorGeometry, floorMaterial)
+    fakeOceanFloor.rotation.x = -Math.PI / 2 // Rotate to horizontal
+    fakeOceanFloor.position.y = -0.15 // Position it below the ocean surface
+    this.scene.add(fakeOceanFloor)
   }
 
   update() {
