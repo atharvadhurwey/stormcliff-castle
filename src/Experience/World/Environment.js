@@ -17,7 +17,6 @@ export default class Environment {
     }
 
     this.setSunLight()
-    // this.setPostLamp()
     this.setEnvironmentMap()
     // this.setAmbientLight()
     this.setFog()
@@ -37,9 +36,9 @@ export default class Environment {
     this.sunLight = new THREE.DirectionalLight(this.sunLightObject.color, this.sunLightObject.intensity)
     this.sunLight.castShadow = true
     this.sunLight.shadow.camera.far = this.sunLightObject.far
-    this.sunLight.shadow.mapSize.set(2048, 2048)
     this.sunLight.shadow.normalBias = this.sunLightObject.normalBias
     this.sunLight.shadow.radius = this.sunLightObject.radius
+    this.sunLight.shadow.mapSize.set(2048, 2048)
     this.scene.add(this.sunLight)
 
     if (this.debug.active) {
@@ -92,23 +91,6 @@ export default class Environment {
         .min(0)
         .max(5)
         .onChange(() => (this.sunLight.shadow.radius = this.sunLightObject.radius))
-    }
-  }
-
-  setPostLamp() {
-    this.postLamp = new THREE.PointLight("#acacc1", 0.5, 10)
-    this.postLamp.castShadow = true
-    this.postLamp.shadow.mapSize.set(1024, 1024)
-    this.postLamp.shadow.camera.far = 10
-    this.postLamp.position.set(0, 1.5, -2)
-    this.scene.add(this.postLamp)
-
-    // Debug
-    if (this.debug.active) {
-      this.debugFolder.add(this.postLamp, "intensity").name("postLampIntensity").min(0).max(10).step(0.001)
-      this.debugFolder.add(this.postLamp.position, "x").name("postLampX").min(-50).max(50).step(0.001)
-      this.debugFolder.add(this.postLamp.position, "y").name("postLampY").min(-50).max(50).step(0.001)
-      this.debugFolder.add(this.postLamp.position, "z").name("postLampZ").min(-50).max(50).step(0.001)
     }
   }
 

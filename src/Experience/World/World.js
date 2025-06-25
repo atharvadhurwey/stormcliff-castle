@@ -1,6 +1,5 @@
 import Experience from "../Experience.js"
 import Environment from "./Environment.js"
-import Floor from "./Floor.js"
 import Castle from "./Castle.js"
 import Ocean from "./Ocean.js"
 import Lightning from "./Lightning.js"
@@ -14,7 +13,6 @@ export default class World {
     // Wait for resources
     this.resources.on("ready", () => {
       // Setup
-      // this.floor = new Floor()
       this.castle = new Castle()
       this.environment = new Environment()
       this.ocean = new Ocean({ resolution: 512, environmentMap: this.environment.environmentMap })
