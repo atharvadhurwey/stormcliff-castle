@@ -16,6 +16,7 @@
     "gl-noise": "^1.6.1",
     "lil-gui": "^0.20.0",
     "maath": "^0.10.8",
+    "stats.js": "^0.17.0",
     "three": "^0.174.0",
     "three-custom-shader-material": "^6.3.7",
     "three-stdlib": "^2.36.0"

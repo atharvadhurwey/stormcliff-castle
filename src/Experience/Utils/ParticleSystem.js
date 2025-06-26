@@ -57,6 +57,8 @@ export default class ParticleSystem {
     }
 
     this._material = new THREE.ShaderMaterial({
+      precision: "lowp",
+
       uniforms: uniforms,
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,

@@ -30,7 +30,6 @@ export default class Camera {
     this.controls.minDistance = 0.3
     this.controls.maxDistance = 1.4
     this.controls.enablePan = false
-    // this.controls.enableZoom = false
   }
 
   resize() {

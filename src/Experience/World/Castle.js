@@ -42,18 +42,13 @@ export default class Castle {
         this.raycaster.registerObjectForRaycast(child)
       }
 
+      // Special case to destroy the bridge later
       if (child.name.includes("Bridge_raycast") && !child.name.includes("Bridge_raycast_")) {
         this.Bridge = child
         this.BridgePosition = child.position.clone()
       }
-
       if (child.name.includes("BridgeBrick_raycast") && !child.name.includes("BridgeBrick_raycast_")) {
         this.BridgeBrick = child
-      }
-
-      if (child.name.includes("_anim_")) {
-        this.animationMeshes.push(child)
-        child.visible = false // Hide animation meshes by default
       }
 
       // Special case to Burn the tree later
@@ -62,8 +57,14 @@ export default class Castle {
         this.TreePosition = child.position.clone()
       }
 
+      // Animation meshes
+      if (child.name.includes("_anim_")) {
+        this.animationMeshes.push(child)
+        child.visible = false // Hide animation meshes by default
+      }
+
       if (child instanceof THREE.Mesh) {
-        child.castShadow = true
+        // child.castShadow = true
         child.receiveShadow = true
       }
     })

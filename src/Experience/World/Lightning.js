@@ -2,7 +2,7 @@ import * as THREE from "three"
 import Experience from "../Experience.js"
 import { EffectComposer, LightningStrike, OutlinePass, RenderPass } from "three-stdlib"
 import ParticleSystem from "../Utils/ParticleSystem.js"
-import { createDissolveMaterial } from "../Utils/DissolveMaterial.js"
+import { createDissolveMaterial } from "../Materials/dissolveMaterial.js"
 import { easing } from "maath"
 
 export default class Lightning {
@@ -61,7 +61,13 @@ export default class Lightning {
       this.composer.render()
       this.lightningStrikeMesh.visible = false
       this.light.visible = false
+      this.fireLight.visible = true
+      this.renderer.render(this.scene, this.camera)
+      this.renderer.render(this.scene, this.camera)
+      this.fireLight.visible = false
+
       console.log("Lightning pre-warmed and ready for action.")
+      this.resources.finishLoading() // Call finishLoading to hide the loading screen
     }, 1000) // Slight delay to let resources settle
 
     this.randomLightningInterval = 3000 // 3 seconds
@@ -72,27 +78,6 @@ export default class Lightning {
 
     this.startRandomLightning()
   }
-
-  // startRandomLightning() {
-  //   setInterval(() => {
-  //     if (!this.randomLightningEnabled) return
-
-  //     const lightningCount = this.randomLightningCount
-
-  //     for (let i = 0; i < lightningCount; i++) {
-  //       const angle = Math.random() * Math.PI * 2
-  //       const radius = this.randomLightningRadius * Math.sqrt(Math.random())
-  //       const x = Math.cos(angle) * radius
-  //       const z = Math.sin(angle) * radius
-
-  //       const center = this.camera.position.clone()
-  //       const startPosition = new THREE.Vector3(center.x + x, 50, center.z + z)
-  //       const endPosition = new THREE.Vector3(center.x + x, 0, center.z + z)
-
-  //       this.castRandomLightningStrike(startPosition, endPosition)
-  //     }
-  //   }, this.randomLightningInterval)
-  // }
 
   startRandomLightning() {
     setInterval(() => {
@@ -134,9 +119,9 @@ export default class Lightning {
 
     this.fireLightDecaySpeed = 0.00001 // Speed at which the light decays
 
-    this.fireLight = new THREE.PointLight(0xffa500, 0.01)
+    this.fireLight = new THREE.PointLight(0xffa500, 0.01, 1, 1.5)
     this.fireLight.position.copy(this.TreePosition).add(new THREE.Vector3(0, 0.03, 0)) // Position the light slightly above the tree
-    // this.fireLight.castShadow = true
+    this.fireLight.castShadow = false
     this.fireLight.visible = false // Start with the light invisible
     this.scene.add(this.fireLight)
 
@@ -161,6 +146,8 @@ export default class Lightning {
       this.fireParticles._emit = false
       this.isFireLightDecaying = true
       this.experience.raycaster.objects = this.experience.raycaster.objects.filter((obj) => obj !== this.Tree) // Remove the tree from raycastable objects
+
+      // this.fireLight.remove() //
     }, this.burningDuration)
   }
 
@@ -171,21 +158,6 @@ export default class Lightning {
     this.experience.world.castle.setAnimation()
   }
 
-  // castRandomLightningStrike(startPosition, endPosition) {
-  //   const timeLimit = 1000
-
-  //   this.randomLightningStrike.rayParameters.sourceOffset.copy(startPosition)
-  //   this.randomLightningStrike.rayParameters.destOffset.copy(endPosition)
-
-  //   this.randomLightningStrikeMesh.visible = true // Show the mesh when casting lightning
-
-  //   if (this.randomHideTimeout) clearTimeout(this.randomHideTimeout) // Clear any existing timeout
-
-  //   // Hide lightning after 1 second
-  //   this.randomHideTimeout = setTimeout(() => {
-  //     this.randomLightningStrikeMesh.visible = false
-  //   }, timeLimit)
-  // }
   castRandomLightningStrike(startPosition, endPosition) {
     const timeLimit = 1000
 
@@ -215,7 +187,9 @@ export default class Lightning {
 
     // Special case for burning the tree
     if (endPosition.x == this.TreePosition.x && endPosition.y == this.TreePosition.y && endPosition.z == this.TreePosition.z) {
-      this.burnTree()
+      setTimeout(() => {
+        this.burnTree()
+      }, 500) // Wait half a second after lightning strike
     }
 
     // Special case for destroying the bridge
@@ -276,14 +250,14 @@ export default class Lightning {
       intensity: 0.5, // Default intensity
     }
 
-    this.light = new THREE.PointLight(0x00ffff)
+    this.light = new THREE.PointLight(0x00ffff, this.lightObject.intensity, 2)
     this.light.extraHeight = this.lightObject.extraHeight
-    this.light.castShadow = true
-    this.light.shadow.mapSize.width = 512
-    this.light.shadow.mapSize.height = 512
+    this.light.castShadow = false
+    // this.light.shadow.mapSize.width = 512
+    // this.light.shadow.mapSize.height = 512
     // this.light.shadow.camera.near = 0.5
     // this.light.shadow.camera.far = 500
-    this.light.shadow.normalBias = 0.04
+    // this.light.shadow.normalBias = 0.04
     this.light.visible = false // Start with the light invisible
 
     this.scene.add(this.light)
@@ -460,9 +434,6 @@ export default class Lightning {
       } // Update ocean light intensity
     }
 
-    // if (this.randomLightningStrike && this.randomLightningStrikeMesh.visible) {
-    //   this.randomLightningStrike.update(t)
-    // }
     this.randomLightningStrikes.forEach(({ strike, mesh }) => {
       if (mesh.visible) {
         strike.update(t)

@@ -60,4 +60,10 @@ export default class Resources extends EventEmitter {
       this.trigger("ready")
     }
   }
+
+  finishLoading() {
+    const loadingScreen = document.getElementById("loadingScreen")
+    loadingScreen.style.opacity = "0"
+    loadingScreen.style.display = "none"
+  }
 }

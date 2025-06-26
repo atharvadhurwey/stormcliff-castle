@@ -28,28 +28,38 @@ export default class Environment {
     this.sunLightObject = {
       intensity: 2,
       color: "#acacc1",
-      far: 10,
-      normalBias: 0.04,
+      far: 10.3,
+      near: 9.2,
+      left: 0.8,
+      right: -0.8,
+      top: 0.8,
+      bottom: -0.8,
+      normalBias: 0.002,
       radius: 1,
     }
 
     this.sunLight = new THREE.DirectionalLight(this.sunLightObject.color, this.sunLightObject.intensity)
     this.sunLight.castShadow = true
     this.sunLight.shadow.camera.far = this.sunLightObject.far
+    this.sunLight.shadow.camera.near = this.sunLightObject.near
+    this.sunLight.shadow.camera.left = this.sunLightObject.left
+    this.sunLight.shadow.camera.right = this.sunLightObject.right
+    this.sunLight.shadow.camera.top = this.sunLightObject.top
+    this.sunLight.shadow.camera.bottom = this.sunLightObject.bottom
     this.sunLight.shadow.normalBias = this.sunLightObject.normalBias
     this.sunLight.shadow.radius = this.sunLightObject.radius
-    this.sunLight.shadow.mapSize.set(2048, 2048)
+    this.sunLight.shadow.mapSize.set(1024, 1024)
     this.scene.add(this.sunLight)
 
     if (this.debug.active) {
-      this.helper = new THREE.DirectionalLightHelper(this.sunLight, 5)
+      this.helper = new THREE.CameraHelper(this.sunLight.shadow.camera)
       this.scene.add(this.helper)
     }
 
     // Default spherical coordinates
     this.sunConfig = {
       radius: 10,
-      theta: Math.PI / 4, // around Y (horizontal)
+      theta: 0.7, // around Y (horizontal)
       phi: Math.PI / 3, // from top (vertical)
     }
 

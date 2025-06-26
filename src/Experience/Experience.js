@@ -11,6 +11,8 @@ import Resources from "./Utils/Resources.js"
 import sources from "./sources.js"
 import RaycastHandler from "./Utils/RaycastHandler.js"
 
+import Stats from "stats.js"
+
 let instance = null
 
 export default class Experience {
@@ -38,6 +40,11 @@ export default class Experience {
     this.world = new World()
     this.raycaster = new RaycastHandler()
 
+    if (this.debug.active) {
+      this.stats = new Stats()
+      document.body.appendChild(this.stats.dom)
+    }
+
     // Resize event
     this.sizes.on("resize", () => {
       this.resize()
@@ -58,6 +65,12 @@ export default class Experience {
     this.camera.update()
     this.world.update()
     this.renderer.update()
+
+    if (this.debug.active) {
+      this.stats.update()
+    }
+
+    // console.log(this.renderer.instance.info)
   }
 
   destroy() {

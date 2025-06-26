@@ -40,6 +40,7 @@ export default class Ocean {
     }
 
     this.material = new THREE.ShaderMaterial({
+      precision: "lowp",
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
       uniforms: {
@@ -65,13 +66,13 @@ export default class Ocean {
         uLightSpecularPower: { value: 30.0 }, // Adjust specular power
         uLightDecay: { value: 0.95 }, // Adjust decay factor
       },
-      wireframe: false,
       transparent: true,
     })
 
     this.geometry = new THREE.PlaneGeometry(2, 2, 512, 512)
     this.geometry.deleteAttribute("normal") // Remove normals for better performance
     this.geometry.deleteAttribute("uv2") // Remove secondary UVs for better performance
+    this.geometry.deleteAttribute("uv") // Remove secondary UVs for better performance
 
     this.ocean = new THREE.Mesh(this.geometry, this.material)
     this.ocean.rotation.x = -Math.PI / 2 // Rotate to horizontal
@@ -111,6 +112,7 @@ export default class Ocean {
     })
     floorGeometry.deleteAttribute("normal") // Remove normals for better performance
     floorGeometry.deleteAttribute("uv2") // Remove secondary UVs for better performance
+    floorGeometry.deleteAttribute("uv") // Remove secondary UVs for better performance
     const fakeOceanFloor = new THREE.Mesh(floorGeometry, floorMaterial)
     fakeOceanFloor.rotation.x = -Math.PI / 2 // Rotate to horizontal
     fakeOceanFloor.position.y = -0.15 // Position it below the ocean surface
