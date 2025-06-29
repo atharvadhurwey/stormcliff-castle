@@ -48,7 +48,7 @@ export default class RaycastHandler {
 
       // If the intersected object is a group, we can cast lightning strike
       if (intersectedObject && intersectedObject.name.includes("_raycast") && !intersectedObject.name.includes("_raycast_")) {
-        this.experience.world.lightning.castLightningStrike(intersectedObject.position)
+        this.experience.world.lightning.castLightningStrike(intersects[0].point, intersectedObject, intersects[0].face.normal)
       } else {
         // console.log("No raycastable object found.")
       }

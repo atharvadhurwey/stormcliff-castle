@@ -3,6 +3,9 @@ import Environment from "./Environment.js"
 import Castle from "./Castle.js"
 import Ocean from "./Ocean.js"
 import Lightning from "./Lightning.js"
+import Shield from "./Shield.js"
+import Crystal from "./Crystal.js"
+import BridgeCollapsePhysics from "./BridgeCollapsePhysics.js"
 
 export default class World {
   constructor() {
@@ -17,6 +20,9 @@ export default class World {
       this.environment = new Environment()
       this.ocean = new Ocean({ resolution: 512, environmentMap: this.environment.environmentMap })
       this.lightning = new Lightning()
+      this.bridgeCollapsePhysics = new BridgeCollapsePhysics()
+      // this.crystal = new Crystal()
+      // this.shield = new Shield()
     })
   }
 
@@ -25,5 +31,8 @@ export default class World {
     if (this.environment) this.environment.update()
     if (this.ocean) this.ocean.update()
     if (this.lightning) this.lightning.update()
+    if (this.bridgeCollapsePhysics) this.bridgeCollapsePhysics.update()
+    // if (this.crystal) this.crystal.update()
+    // if (this.shield) this.shield.update()
   }
 }
