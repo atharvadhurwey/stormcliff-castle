@@ -207,9 +207,11 @@ export default class Lightning {
     }
 
     // Special case for crystal
-    // if (raycastedObject && raycastedObject.name.includes("Crystal")) {
-    //   this.experience.world.crystal.animateCrystal = true // Start animating the crystal
-    // }
+    if (raycastedObject && raycastedObject.name.includes("Crystal") && !this.experience.world.crystalAnimation.isAnimating) {
+      this.experience.world.crystalAnimation.isAnimating = true // Set the flag to prevent multiple animations
+      this.experience.world.crystalAnimation.animateCrystal() // Call the method to animate the crystal
+      this.experience.world.crystalAnimation.animateChangeColors() // Change lightning color to red
+    }
 
     // Special case for watchtower
     if (raycastedObject && raycastedObject.name.includes("WatchTower")) {
@@ -253,7 +255,7 @@ export default class Lightning {
       intensity: 0.5, // Default intensity
     }
 
-    this.light = new THREE.PointLight(0x00ffff, this.lightObject.intensity, 2)
+    this.light = new THREE.PointLight(this.lightObject.color, this.lightObject.intensity, 2)
     this.light.extraHeight = this.lightObject.extraHeight
     this.light.castShadow = false
     // this.light.shadow.mapSize.width = 512

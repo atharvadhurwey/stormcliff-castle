@@ -1,7 +1,6 @@
 import * as THREE from "three"
 import Experience from "../Experience.js"
 import Ammo from "../Utils/ammo.js"
-import { ConvexObjectBreaker } from "three-stdlib"
 
 export default class BridgeCollapsePhysics {
   constructor() {
@@ -14,7 +13,6 @@ export default class BridgeCollapsePhysics {
     this.physicsEnabled = false
     this.margin = 0.0
 
-    this.convexBreaker = new ConvexObjectBreaker()
     this.rigidBodies = []
     this.bridgeChunks = this.experience.world.castle.bridgeChunks
 

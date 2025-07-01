@@ -157,7 +157,7 @@ export default class Environment {
       range: 0.08,
       steps: 9,
       position: new THREE.Vector3(0, 50, 0),
-      color: "#87889c",
+      color: "#393e9d",
       scale: new THREE.Vector3(500, 100, 500),
       depthTest: true,
     }
@@ -181,6 +181,12 @@ export default class Environment {
     // Debug
     if (this.debug.active) {
       this.cloudDebugFolder = this.debugFolder.addFolder("clouds")
+      this.cloudDebugFolder
+        .addColor(darkCloudsProps, "color")
+        .name("cloudsMeshColor")
+        .onChange(() => {
+          this.cloudsMesh.material.uniforms.base.value.set(darkCloudsProps.color)
+        })
       this.cloudDebugFolder.add(this.cloudsMesh.material.uniforms.threshold, "value").name("cloudsMeshThreshold").min(0).max(1).step(0.001)
       this.cloudDebugFolder.add(this.cloudsMesh.material.uniforms.opacity, "value").name("cloudsMeshOpacity").min(0).max(1).step(0.001)
       this.cloudDebugFolder.add(this.cloudsMesh.material.uniforms.range, "value").name("cloudsMeshRange").min(0).max(0.2).step(0.001)
