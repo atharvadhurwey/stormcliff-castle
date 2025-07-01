@@ -1,20 +1,28 @@
-# Threejs Castle
+## 🌩️ Stormcliff Castle
+Stormcliff Castle is a 3D scene built with Three.js and Blender, capturing the eerie beauty of a stormy night
 
-## Links
-- [Live](https://castle-story.vercel.app/)
-- [Github](https://github.com/atharvadhurwey/castle-story/)
+### 🔧 Technologies
 
-## Setup
-Download [Node.js](https://nodejs.org/en/download/).
-Run this followed commands:
+- [Three.js](https://threejs.org/)
+- [Ammo.js](https://github.com/kripken/ammo.js)
+- [Blender](https://www.blender.org/) 
 
-``` bash
-# Install dependencies (only the first time)
+### 📦 Setup
+
+```bash
 npm install
-
-# Run the local server at localhost:8080
 npm run dev
-
-# Build for production in the dist/ directory
-npm run build
 ```
+
+### 📸 Screenshots
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7116b211-2777-47b9-b3d4-e122fc6bd35c" width="45%" />
+  <img src="https://github.com/user-attachments/assets/85c126f8-3799-49a1-89a1-e728b6ed915d" width="45%" />
+</p>
+
+### 🗺️ TODO
+
+- Add more destruction
+- Make ocean interact with the cliff
+
+---
