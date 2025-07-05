@@ -70,3 +70,23 @@ body {
       100px 60px rgba(255, 255, 255, 0), 125px 30px rgba(255, 255, 255, 0), 150px 30px rgba(255, 255, 255, 0);
   }
 }
+
+#credits {
+  display: none;
+  position: fixed;
+  bottom: 10px;
+  left: 15px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  font-family: "Arial", sans-serif;
+  z-index: 9999;
+}
+
+#credits a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+}
+
+#credits a:hover {
+  text-decoration: underline;
+}

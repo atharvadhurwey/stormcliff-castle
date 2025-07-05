@@ -64,6 +64,7 @@ export default class Resources extends EventEmitter {
   finishLoading() {
     const loadingScreen = document.getElementById("loadingScreen")
     const loader = document.getElementById("loader")
+    const credits = document.getElementById("credits")
 
     // Create message element
     const messageText = document.createElement("div")
@@ -104,6 +105,7 @@ export default class Resources extends EventEmitter {
           // Hide loading screen after message fades
           setTimeout(() => {
             loadingScreen.style.display = "none"
+            credits.style.display = "block"
           }, 500) // wait for fade-out transition
         }, 2000) // show message for 2s
       }, 600) // wait for first message fade-out
